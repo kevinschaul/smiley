@@ -10,11 +10,18 @@ module.exports = function(grunt) {
                 src: ['src/*.js'],
                 dest: 'dist/<%= pkg.name %>-<%= pkg.version %>.js'
             }
+        },
+        uglify: {
+            js: {
+                src: 'dist/<%= pkg.name %>-<%= pkg.version %>.js',
+                dest: 'dist/<%= pkg.name %>-<%= pkg.version %>.min.js',
+            }
         }
     });
 
     grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
 
-    grunt.registerTask('default', ['concat']);
+    grunt.registerTask('default', ['concat', 'uglify']);
 };
 
