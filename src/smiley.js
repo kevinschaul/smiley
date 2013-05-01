@@ -1,0 +1,206 @@
+var Smiley = function(config) {
+    /*
+    Initialize Smiley object.
+    */
+
+    var self = this;
+    self.config = config;
+    
+    self.controls_select_template_content = [
+        '<select class="smiley-select" id=<%- id %>>',
+        '<option disabled="disabled" selected>Choose</option>',
+        '<% _.each(options, function(option) { %>',
+        '<option value="<%- option %>"><%- option %></option>',
+        '<% }); %>',
+        '</select>',
+    ].join('');
+    self.controls_select_template = _.template(
+        self.controls_select_template_content
+    );
+
+    self.ds = new Miso.Dataset({
+        url: self.config['data_url'],
+        jsonp: true,
+        callback: self.config['data_callback'],
+        extract: function(data) {
+            // TODO This is too specific
+            return data.items;
+        }
+    });
+    self.dataview = null;
+    self.filter = new Filter(self);
+
+    self.display_modules = [];
+    _.each(self.config['views'], function(v, k) {
+        switch(k) {
+            case 'table': {
+                self.display_modules.push(new Table_Display(self, v))
+                break;
+            }
+            case 'map': {
+                self.display_modules.push(new Map_Display(self, v))
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+    });
+};
+
+Smiley.prototype.fetch = function() {
+    /*
+    Fetch the data. Called at the user's leisure.
+    */
+
+    var self = this;
+    this.ds.fetch({
+        success: function() {
+            self._handle_data(this);
+        },
+        error: function() {
+            console.log('error in ds.fetch()');
+        }
+    });
+};
+
+Smiley.prototype._handle_data = function() {
+    /*
+    Handle initial load of the data.
+    */
+
+    var self = this;
+    self._build_controls();
+    self._reset_dataview();
+    self.update_displays();
+};
+
+Smiley.prototype.update_displays = function() {
+    /*
+    Call the update method of each active display module.
+    */
+
+    var self = this;
+
+    _.each(self.display_modules, function(e) {
+        e.update();
+    });
+};
+
+Smiley.prototype._build_controls = function() {
+    /*
+    Create html for controls, based on `self.config`.
+    */
+
+    var self = this;
+    var controls_html = [];
+    if (self.config['categories_to_facet_by']) {
+        _.each(self.config['categories_to_facet_by'], function(category) {
+            // Find unique values
+            var uniques = [];
+            var data = self.ds.column(category).data;
+            _.each(data, function(item) {
+                if (_.isArray(item)) {
+                    _.each(item, function(subitem) {
+                        if (!_.contains(uniques, subitem)) {
+                            uniques.push(subitem);
+                        }
+                    });
+                } else {
+                    if (!_.contains(uniques, item)) {
+                        uniques.push(item);
+                    }
+                }
+            });
+
+            var uniques_sorted = _.sortBy(uniques, function(item) {
+                return item;
+            });
+
+            // Send unique values to a select html element
+            var element_id = 'element-' + category;
+            $('#camp-controls').append(
+                self.controls_select_template({
+                    'id': element_id,
+                    'options': uniques_sorted
+                })
+            );
+
+            // Set up change events to the html element
+            $('#' + element_id).change(function() {
+                self.filter.add_filter({
+                    'type': 'filter',
+                    'needle': this.value,
+                    'category': category
+                });
+                self.filter.perform_filtering();
+            });
+        });
+    }
+
+    $('#camp-controls').append(
+        'Search <input id="search" type="text" />'
+    );
+
+    // Set up reset filters button
+    $('#camp-controls').append(
+        '<input id=\'reset\' type=\'button\' value=\'Reset\'>'
+    );
+    $('#reset').click(function() {
+        self._reset_controls();
+        self.filter.reset_filters();
+    });
+
+    // Set a timer, so that search is not called on every keypress when a user
+    // is typing.
+    var timer = null;
+    var search_length = 0;
+    // TODO Create fallback for other browsers
+    $('#search').on('input', function() {
+        if (timer) {
+            clearTimeout(timer);
+        }
+        timer = setTimeout(function() {
+            var search_val = $('#search').val();
+            self.filter.add_filter({
+                'type': 'search',
+                'needle': search_val
+            });
+            // Reset dataview if backspace
+            if (search_val.length <= search_length) {
+                // TODO This resets all filters, not just search
+                self._reset_dataview();
+            }
+            search_length = search_val.length;
+            self.filter.perform_filtering();
+        }, 250);
+    });
+};
+
+Smiley.prototype._reset_controls = function() {
+    /*
+    Resets any controls to their default state
+    */
+
+    var self = this;
+    var smileys = $('.smiley-select');
+    _.each(smileys, function(e, i) {
+        smileys[i].selectedIndex = 0;
+    });
+
+    $('#search').val('');
+};
+
+Smiley.prototype._reset_dataview = function() {
+    /*
+    Sets the dataview to include all intial data.
+    */
+
+    var self = this;
+    self.dataview = self.ds.where({
+        rows: function(row) {
+            return true;
+        }
+    });
+};
+
