@@ -61,6 +61,7 @@ Filter.prototype._search = function(needle) {
     one of their `categories_to_search_by`.
     */
 
+    var lneedle = needle.toLowerCase();
     var self = this;
     return self._smiley.dataview.where({
         rows: function(row) {
@@ -69,14 +70,14 @@ Filter.prototype._search = function(needle) {
             _.each(CONFIG['categories_to_search_by'], function(category) {
                 if (_.isString(row[category])) {
                     var haystack = row[category];
-                    if (haystack.toLowerCase().indexOf(needle) >= 0) {
+                    if (haystack.toLowerCase().indexOf(lneedle) >= 0) {
                         ret = true;
                     }
                 } else {
                     // Treat the category as an array
                     var categories = row[category];
                     _.each(categories, function(haystack) {
-                        if (haystack.toLowerCase().indexOf(needle) >= 0) {
+                        if (haystack.toLowerCase().indexOf(lneedle) >= 0) {
                             ret = true;
                         }
                     });
