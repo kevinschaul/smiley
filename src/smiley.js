@@ -129,7 +129,8 @@ Smiley.prototype._build_controls = function() {
 
             // Set up change events to the html element
             $('#' + element_id).change(function() {
-                self.filter.add_filter({
+                self.search.reset_control();
+                self.filter.add_filter(element_id, {
                     'needle': this.value,
                     'category': category
                 });
@@ -142,7 +143,7 @@ Smiley.prototype._build_controls = function() {
         'Search <input id="smiley-search" type="text" />'
     );
 
-    // Set up reset filters button
+    // Set up eeset filters button
     $('#camp-controls').append(
         '<input id=\'reset\' type=\'button\' value=\'Reset\'>'
     );
@@ -157,6 +158,7 @@ Smiley.prototype._build_controls = function() {
     var timer = null;
     // TODO Create fallback for other browsers
     $('#smiley-search').on('input', function() {
+        self.filter.reset_control();
         if (timer) {
             clearTimeout(timer);
         }
@@ -175,12 +177,8 @@ Smiley.prototype._reset_controls = function() {
     */
 
     var self = this;
-    var smileys = $('.smiley-select');
-    _.each(smileys, function(e, i) {
-        smileys[i].selectedIndex = 0;
-    });
-
-    $('#smiley-search').val('');
+    self.filter.reset_control();
+    self.search.reset_control();
 };
 
 Smiley.prototype._reset_dataview = function() {

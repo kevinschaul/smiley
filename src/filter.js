@@ -6,25 +6,35 @@ var Filter = function(smiley) {
     */
 
     this._smiley = smiley;
-    this._filters = [];
+    this._filters = {};
 };
 
-Filter.prototype.add_filter = function(filter) {
+Filter.prototype.add_filter = function(id, filter) {
     var self = this;
-    self._filters.push(filter);
+    if (self._filters[id] || _.size(self._filters) === 0) {
+        self._smiley._reset_dataview();
+    }
+    self._filters[id] = filter;
 };
 
 Filter.prototype.reset = function() {
     var self = this;
-    self._filters = [];
+    self._filters = {};
     self._smiley._reset_dataview();
     self._smiley.update_displays();
 };
 
+Filter.prototype.reset_control = function() {
+    var smileys = $('.smiley-select');
+    _.each(smileys, function(e, i) {
+        smileys[i].selectedIndex = 0;
+    });
+};
+
 Filter.prototype.perform_filtering = function() {
     var self = this;
-    _.each(self._filters, function(e) {
-        self._smiley.dataview = self._filter(e['needle'], e['category']);
+    _.each(self._filters, function(v, e) {
+        self._smiley.dataview = self._filter(v['needle'], v['category']);
     });
 
     self._smiley.update_displays();

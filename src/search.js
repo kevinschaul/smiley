@@ -20,6 +20,10 @@ Search.prototype.reset = function() {
     self._smiley.update_displays();
 };
 
+Search.prototype.reset_control = function() {
+    $('#smiley-search').val('');
+};
+
 Search.prototype._search = function(needle) {
     /*
     Return a datasource containing elements that have `needle` in at least
