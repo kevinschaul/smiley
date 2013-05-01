@@ -29,6 +29,7 @@ var Smiley = function(config) {
     });
     self.dataview = null;
     self.filter = new Filter(self);
+    self.search = new Search(self);
 
     self.display_modules = [];
     _.each(self.config['views'], function(v, k) {
@@ -129,7 +130,6 @@ Smiley.prototype._build_controls = function() {
             // Set up change events to the html element
             $('#' + element_id).change(function() {
                 self.filter.add_filter({
-                    'type': 'filter',
                     'needle': this.value,
                     'category': category
                 });
@@ -139,7 +139,7 @@ Smiley.prototype._build_controls = function() {
     }
 
     $('#camp-controls').append(
-        'Search <input id="search" type="text" />'
+        'Search <input id="smiley-search" type="text" />'
     );
 
     // Set up reset filters button
@@ -148,31 +148,23 @@ Smiley.prototype._build_controls = function() {
     );
     $('#reset').click(function() {
         self._reset_controls();
-        self.filter.reset_filters();
+        self.filter.reset();
+        self.search.reset();
     });
 
     // Set a timer, so that search is not called on every keypress when a user
     // is typing.
     var timer = null;
-    var search_length = 0;
     // TODO Create fallback for other browsers
-    $('#search').on('input', function() {
+    $('#smiley-search').on('input', function() {
         if (timer) {
             clearTimeout(timer);
         }
         timer = setTimeout(function() {
-            var search_val = $('#search').val();
-            self.filter.add_filter({
-                'type': 'search',
-                'needle': search_val
-            });
-            // Reset dataview if backspace
-            if (search_val.length <= search_length) {
-                // TODO This resets all filters, not just search
-                self._reset_dataview();
-            }
-            search_length = search_val.length;
-            self.filter.perform_filtering();
+            var search_val = $('#smiley-search').val();
+            self._reset_dataview();
+            self.search.perform_search(search_val);
+            self.update_displays();
         }, 250);
     });
 };
@@ -188,7 +180,7 @@ Smiley.prototype._reset_controls = function() {
         smileys[i].selectedIndex = 0;
     });
 
-    $('#search').val('');
+    $('#smiley-search').val('');
 };
 
 Smiley.prototype._reset_dataview = function() {
