@@ -83,7 +83,6 @@ Required:
 Optional:
 
 - `lat_lng`: (String) The json property including location information. Currently must be in the format `'lat,lng'`. Required if `map` view is included in `views`.
-To initialize Smiley, pass an object with these configuration values to its constructor, and call the `go()` method.
 
 
 Development
