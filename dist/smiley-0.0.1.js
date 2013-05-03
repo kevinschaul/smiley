@@ -191,10 +191,12 @@ var Map_Display = Display_Module.extend({
 
 Filter.prototype.add_filter = function(id, filter) {
     var self = this;
-    if (self._filters[id] || _.size(self._filters) === 0) {
-        self._smiley._reset_dataview();
-    }
     self._filters[id] = filter;
+};
+
+Filter.prototype.remove_filter = function(id) {
+    var self = this;
+    delete self._filters[id];
 };
 
 Filter.prototype.reset = function() {
@@ -213,6 +215,7 @@ Filter.prototype.reset_control = function() {
 
 Filter.prototype.perform_filtering = function() {
     var self = this;
+    self._smiley._reset_dataview();
     _.each(self._filters, function(v, e) {
         self._smiley.dataview = self._filter(v['needle'], v['category']);
     });
@@ -302,7 +305,7 @@ Search.prototype._search = function(needle) {
     
     self.controls_select_template_content = [
         '<select class="smiley-select" id=<%- id %>>',
-        '<option disabled="disabled" selected>Choose</option>',
+        '<option value="choose" selected>Choose</option>',
         '<% _.each(options, function(option) { %>',
         '<option value="<%- option %>"><%- option %></option>',
         '<% }); %>',
@@ -423,11 +426,17 @@ Smiley.prototype._build_controls = function() {
 
             // Set up change events to the html element
             $('#' + element_id).change(function() {
-                self.search.reset_control();
-                self.filter.add_filter(element_id, {
-                    'needle': this.value,
-                    'category': category
-                });
+                console.log(this);
+                if (this.selectedIndex === 0) {
+                    console.log('reset');
+                    self.filter.remove_filter(element_id);
+                } else {
+                    self.search.reset_control();
+                    self.filter.add_filter(element_id, {
+                        'needle': this.value,
+                        'category': category
+                    });
+                }
                 self.filter.perform_filtering();
             });
         });
@@ -458,7 +467,7 @@ Smiley.prototype._build_controls = function() {
         }
         timer = setTimeout(function() {
             var search_val = $('#smiley-search').val();
-            self._reset_dataview();
+            self.filter.reset();
             self.search.perform_search(search_val);
             self.update_displays();
         }, 250);

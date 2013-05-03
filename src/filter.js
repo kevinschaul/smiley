@@ -11,10 +11,12 @@ var Filter = function(smiley) {
 
 Filter.prototype.add_filter = function(id, filter) {
     var self = this;
-    if (self._filters[id] || _.size(self._filters) === 0) {
-        self._smiley._reset_dataview();
-    }
     self._filters[id] = filter;
+};
+
+Filter.prototype.remove_filter = function(id) {
+    var self = this;
+    delete self._filters[id];
 };
 
 Filter.prototype.reset = function() {
@@ -33,6 +35,7 @@ Filter.prototype.reset_control = function() {
 
 Filter.prototype.perform_filtering = function() {
     var self = this;
+    self._smiley._reset_dataview();
     _.each(self._filters, function(v, e) {
         self._smiley.dataview = self._filter(v['needle'], v['category']);
     });
