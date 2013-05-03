@@ -192,6 +192,10 @@ Smiley.prototype._build_controls = function() {
         var inputs = $('input[name="smiley-views"]');
         inputs.change(function() {
             self.show_display_module($(this).val());
+            self._reset_controls()
+            self._reset_dataview()
+            self.filter.reset();
+            self.search.reset();
         });
         $(inputs[0]).prop("checked", true);
         $(inputs[0]).trigger('change');

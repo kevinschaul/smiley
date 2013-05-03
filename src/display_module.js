@@ -3,6 +3,7 @@ var Display_Module = Class.extend({
         this._smiley = smiley;
         this.target_div = target_div;
         this.html_template = null;
+        this._hidden = true;
     },
     update: function(dataview) {
         var num_items = this._smiley.dataview.length;
@@ -18,9 +19,11 @@ var Display_Module = Class.extend({
     },
     show: function() {
         $('#' + this.target_div).show();
+        this._hidden = false;
     },
     hide: function() {
         $('#' + this.target_div).hide();
+        this._hidden = true;
     }
 });
 
@@ -88,35 +91,37 @@ var Map_Display = Display_Module.extend({
         */
 
         var self = this;
-        if (self.markersLayer && self.map.hasLayer(self.markersLayer)) {
-            self.map.removeLayer(self.markersLayer);
-        }
-        self.markersLayer = new L.MarkerClusterGroup();
-        var at_least_one_point = false;
-        self._smiley.dataview.each(function(row) {
-            at_least_one_point = true;
-            var lat_lng = row[self._smiley.config['lat_lng']];
-            if (lat_lng) {
-                var marker = new L.marker(lat_lng.split(','));
-                var popup = [];
-                _.each(self._smiley.config['categories_to_show'], function(v, k) {
-                    popup.push([
-                        '<b>',
-                        k,
-                        ': ',
-                        '</b>',
-                        row[v],
-                        '<br />'
-                    ].join(''))
-                });
-                marker.bindPopup(popup.join(''));
-                self.markersLayer.addLayer(marker);
+        if (!self._hidden) {
+            if (self.markersLayer && self.map.hasLayer(self.markersLayer)) {
+                self.map.removeLayer(self.markersLayer);
             }
-        });
-        self.map.addLayer(self.markersLayer);
-        // Reset map view to show new data
-        if (at_least_one_point) {
-            self.map.fitBounds(self.markersLayer.getBounds());
+            self.markersLayer = new L.MarkerClusterGroup();
+            var at_least_one_point = false;
+            self._smiley.dataview.each(function(row) {
+                at_least_one_point = true;
+                var lat_lng = row[self._smiley.config['lat_lng']];
+                if (lat_lng) {
+                    var marker = new L.marker(lat_lng.split(','));
+                    var popup = [];
+                    _.each(self._smiley.config['categories_to_show'], function(v, k) {
+                        popup.push([
+                            '<b>',
+                            k,
+                            ': ',
+                            '</b>',
+                            row[v],
+                            '<br />'
+                        ].join(''))
+                    });
+                    marker.bindPopup(popup.join(''));
+                    self.markersLayer.addLayer(marker);
+                }
+            });
+            self.map.addLayer(self.markersLayer);
+            // Reset map view to show new data
+            if (at_least_one_point) {
+                self.map.fitBounds(self.markersLayer.getBounds());
+            }
         }
     }
 });

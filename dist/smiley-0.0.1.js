@@ -66,6 +66,7 @@
         this._smiley = smiley;
         this.target_div = target_div;
         this.html_template = null;
+        this._hidden = true;
     },
     update: function(dataview) {
         var num_items = this._smiley.dataview.length;
@@ -78,6 +79,14 @@
         var suffix = num_items !== 1 ? 's' : '';
         message_content.push(suffix);
         $('#camp-messages').html(message_content.join(''));
+    },
+    show: function() {
+        $('#' + this.target_div).show();
+        this._hidden = false;
+    },
+    hide: function() {
+        $('#' + this.target_div).hide();
+        this._hidden = true;
     }
 });
 
@@ -145,35 +154,37 @@ var Map_Display = Display_Module.extend({
         */
 
         var self = this;
-        if (self.markersLayer && self.map.hasLayer(self.markersLayer)) {
-            self.map.removeLayer(self.markersLayer);
-        }
-        self.markersLayer = new L.MarkerClusterGroup();
-        var at_least_one_point = false;
-        self._smiley.dataview.each(function(row) {
-            at_least_one_point = true;
-            var lat_lng = row[self._smiley.config['lat_lng']];
-            if (lat_lng) {
-                var marker = new L.marker(lat_lng.split(','));
-                var popup = [];
-                _.each(self._smiley.config['categories_to_show'], function(v, k) {
-                    popup.push([
-                        '<b>',
-                        k,
-                        ': ',
-                        '</b>',
-                        row[v],
-                        '<br />'
-                    ].join(''))
-                });
-                marker.bindPopup(popup.join(''));
-                self.markersLayer.addLayer(marker);
+        if (!self._hidden) {
+            if (self.markersLayer && self.map.hasLayer(self.markersLayer)) {
+                self.map.removeLayer(self.markersLayer);
             }
-        });
-        self.map.addLayer(self.markersLayer);
-        // Reset map view to show new data
-        if (at_least_one_point) {
-            self.map.fitBounds(self.markersLayer.getBounds());
+            self.markersLayer = new L.MarkerClusterGroup();
+            var at_least_one_point = false;
+            self._smiley.dataview.each(function(row) {
+                at_least_one_point = true;
+                var lat_lng = row[self._smiley.config['lat_lng']];
+                if (lat_lng) {
+                    var marker = new L.marker(lat_lng.split(','));
+                    var popup = [];
+                    _.each(self._smiley.config['categories_to_show'], function(v, k) {
+                        popup.push([
+                            '<b>',
+                            k,
+                            ': ',
+                            '</b>',
+                            row[v],
+                            '<br />'
+                        ].join(''))
+                    });
+                    marker.bindPopup(popup.join(''));
+                    self.markersLayer.addLayer(marker);
+                }
+            });
+            self.map.addLayer(self.markersLayer);
+            // Reset map view to show new data
+            if (at_least_one_point) {
+                self.map.fitBounds(self.markersLayer.getBounds());
+            }
         }
     }
 });
@@ -330,13 +341,17 @@ Search.prototype._search = function(needle) {
 
     self.display_modules = [];
     _.each(self.config['views'], function(v, k) {
-        switch(k) {
+        switch(v['type']) {
             case 'table': {
-                self.display_modules.push(new Table_Display(self, v))
+                self.display_modules.push(
+                    new Table_Display(self, v['target_div'])
+                )
                 break;
             }
             case 'map': {
-                self.display_modules.push(new Map_Display(self, v))
+                self.display_modules.push(
+                    new Map_Display(self, v['target_div'])
+                )
                 break;
             }
             default: {
@@ -426,9 +441,7 @@ Smiley.prototype._build_controls = function() {
 
             // Set up change events to the html element
             $('#' + element_id).change(function() {
-                console.log(this);
                 if (this.selectedIndex === 0) {
-                    console.log('reset');
                     self.filter.remove_filter(element_id);
                 } else {
                     self.search.reset_control();
@@ -472,6 +485,37 @@ Smiley.prototype._build_controls = function() {
             self.update_displays();
         }, 250);
     });
+
+    if (self.config['views']) {
+        // TODO Use a template
+        $('#camp-controls').append('View: ');
+        _.each(self.config['views'], function(v, k) {
+            $('#camp-controls').append([
+                '<input type="radio" name="smiley-views" value="',
+                k,
+                '">',
+                v['label']
+            ].join(''));
+        });
+        var inputs = $('input[name="smiley-views"]');
+        inputs.change(function() {
+            self.show_display_module($(this).val());
+            self._reset_controls()
+            self._reset_dataview()
+            self.filter.reset();
+            self.search.reset();
+        });
+        $(inputs[0]).prop("checked", true);
+        $(inputs[0]).trigger('change');
+    }
+};
+
+Smiley.prototype.show_display_module = function(display_module_index) {
+    var self = this;
+    _.each(self.display_modules, function(e) {
+        e.hide();
+    });
+    self.display_modules[display_module_index].show();
 };
 
 Smiley.prototype._reset_controls = function() {
