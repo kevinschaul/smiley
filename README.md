@@ -94,6 +94,8 @@ This code is ultra alpha, and has only been tested against the Star Tribune's ex
 Development
 ===========
 
+No guarantees here, but this might get you started.
+
 Assuming Node.js is already installed:
 
     npm install -g grunt-init grunt-cli
