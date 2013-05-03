@@ -65,6 +65,12 @@ To run Smiley, create a new instance with these `CONFIG` values, and call its `g
         s.go();
     });
 
+To run a working example from this repository:
+
+1. Begin a server in this project's root: `python -m SimpleHTTPServer`
+
+2. Visit [http:127.0.0.1:8000/examples/camp-guide.html](http:127.0.0.1:8000/examples/camp-guide.html) in your browser.
+
 
 Field definitions
 -----------------

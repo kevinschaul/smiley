@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+    <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+    <title>Camp guide</title>
+    <script type='text/javascript' src='/lib/jquery.min.js'></script>
+    <script type='text/javascript' src='/lib/underscore-min.js'></script>
+    <script type='text/javascript' src='/lib/miso.ds.deps.min.0.4.0.js'></script>
+    <script type='text/javascript' src='/lib/leaflet/leaflet-src.js'></script>
+    <script type='text/javascript' src='/lib/leaflet/plugins/leaflet.markercluster.js'></script>
+
+    <script type='text/javascript' src='/dist/smiley-0.0.1.js'></script>
+
+    <link rel='stylesheet' href='/lib/leaflet/leaflet.css' />
+    <link rel='stylesheet' href='/lib/leaflet/plugins/MarkerCluster.css' />
+    <link rel='stylesheet' href='/lib/leaflet/plugins/MarkerCluster.Default.css' />
+    <!--[if lte IE 8]>
+        <link rel='stylesheet' href='/lib/leaflet/leaflet.ie.css' />
+        <link rel='stylesheet' href='/lib/leaflet/plugins/MarkerCluster.Default.ie.css' />
+    <![endif]-->
+</head>
+<body>
+
+<div id='camp-main'></div>
+<div id='camp-map-wrapper'>
+    <div id='map-target' style="height:400px; width:400px;"></div>
+</div>
+<div id='camp-table-wrapper'>
+    <table id='table-target'></table>
+</div>
+
+<script type="text/javascript">
+
+var CONFIG = {
+    'target_div': 'camp-main',
+    'data_url': 'http://127.0.0.1:8000/examples/camp_guide.jsonp',
+    'data_url': '/examples/camp_guide.jsonp',
+    'data_callback': 'miso_callback',
+    'data_subset': 'items',
+    'categories_to_show': {
+        'Camp name': 'label',
+        'Price range': 'price_range',
+        'Ages': 'event_who',
+        'Categories': 'event_category_array'
+    },
+    'categories_to_facet_by': [
+        'event_category_array',
+    ],
+    'categories_to_search_by': [
+        'label',
+        'event_category_array'
+    ],
+    'views': [
+        {
+            'label': 'Map',
+            'type': 'map',
+            'target_div': 'map-target'
+        },
+        {
+            'label': 'Table',
+            'type': 'table',
+            'target_div': 'table-target'
+        },
+    ],
+    'lat_lng': 'latLng'
+};
+
+$(document).ready(function() {
+    window.s = new Smiley(CONFIG);
+    s.go();
+});
+</script>
+
+</body>
+</html>
+
