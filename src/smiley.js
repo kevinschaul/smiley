@@ -189,9 +189,12 @@ Smiley.prototype._build_controls = function() {
                 v['label']
             ].join(''));
         });
-        $('input[name="smiley-views"]').change(function() {
-            self.show_display_module(this.value);
+        var inputs = $('input[name="smiley-views"]');
+        inputs.change(function() {
+            self.show_display_module($(this).val());
         });
+        $(inputs[0]).prop("checked", true);
+        $(inputs[0]).trigger('change');
     }
 };
 
