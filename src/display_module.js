@@ -15,7 +15,7 @@ var Display_Module = Class.extend({
         ];
         var suffix = num_items !== 1 ? 's' : '';
         message_content.push(suffix);
-        $('#camp-messages').html(message_content.join(''));
+        $('#smiley-messages').html(message_content.join(''));
     },
     show: function() {
         $('#' + this.target_div).show();

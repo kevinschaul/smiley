@@ -26,6 +26,7 @@ Usage
 Smiley requires a set of configuration parameters to be set, in loose JSON. An example configuration follows:
  
     var CONFIG = {
+        'target_div': 'camp-main',
         'data_url': 'http://0.0.0.0:8000/camp-guide-2013/data/workspace/camp_guide.jsonp',
         'data_callback': 'miso_callback',
         'data_subset': 'items', 
@@ -70,6 +71,7 @@ Field definitions
 
 Required:
 
+- `target_div`: (String) The CSS id of an empty div, for Smiley to work in.
 - `data_url`: (String) The URL of the jsonp feed
 - `data_callback`: (String) The callback of the jsonp feed
 - `data_subset`: (String) The subset of the json feed that the data resides in

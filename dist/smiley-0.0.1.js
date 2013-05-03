@@ -78,7 +78,7 @@
         ];
         var suffix = num_items !== 1 ? 's' : '';
         message_content.push(suffix);
-        $('#camp-messages').html(message_content.join(''));
+        $('#smiley-messages').html(message_content.join(''));
     },
     show: function() {
         $('#' + this.target_div).show();
@@ -408,6 +408,10 @@ Smiley.prototype._build_controls = function() {
     */
 
     var self = this;
+    $('#' + self.config['target_div']).html([
+        '<div id="smiley-controls"></div>',
+        '<div id="smiley-messages"></div>',
+    ].join(''));
     var controls_html = [];
     if (self.config['categories_to_facet_by']) {
         _.each(self.config['categories_to_facet_by'], function(category) {
@@ -434,7 +438,7 @@ Smiley.prototype._build_controls = function() {
 
             // Send unique values to a select html element
             var element_id = 'element-' + category;
-            $('#camp-controls').append(
+            $('#smiley-controls').append(
                 self.controls_select_template({
                     'id': element_id,
                     'options': uniques_sorted
@@ -457,12 +461,12 @@ Smiley.prototype._build_controls = function() {
         });
     }
 
-    $('#camp-controls').append(
+    $('#smiley-controls').append(
         'Search <input id="smiley-search" type="text" />'
     );
 
     // Set up eeset filters button
-    $('#camp-controls').append(
+    $('#smiley-controls').append(
         '<input id=\'reset\' type=\'button\' value=\'Reset\'>'
     );
     $('#reset').click(function() {
@@ -490,9 +494,9 @@ Smiley.prototype._build_controls = function() {
 
     if (self.config['views']) {
         // TODO Use a template
-        $('#camp-controls').append('View: ');
+        $('#smiley-controls').append('View: ');
         _.each(self.config['views'], function(v, k) {
-            $('#camp-controls').append([
+            $('#smiley-controls').append([
                 '<input type="radio" name="smiley-views" value="',
                 k,
                 '">',
