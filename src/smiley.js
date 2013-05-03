@@ -23,8 +23,10 @@ var Smiley = function(config) {
         jsonp: true,
         callback: self.config['data_callback'],
         extract: function(data) {
-            // TODO This is too specific
-            return data.items;
+            if (self.config['data_subset']) {
+                return data[self.config['data_subset']];
+            }
+            return data;
         }
     });
     self.dataview = null;
