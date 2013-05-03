@@ -70,7 +70,6 @@ var Map_Display = Display_Module.extend({
 
         var self = this;
         this._super(smiley, target_div);
-        // TODO generalize initial map view
         var MAP_OPTIONS = {
             maxZoom: 12,
             scrollWheelZoom: false
@@ -79,7 +78,7 @@ var Map_Display = Display_Module.extend({
         var BASE_LAYER_URL = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
         var BASE_LAYER_OPTIONS = {
             subdomains: ['a', 'b', 'c'],
-            attribution: '<a href="http://www.openstreetmap.org/copyright">&copy; OpenStreetMap contributors</a> CC-BY-SA',
+            attribution: '<a href="http://www.openstreetmap.org/copyright">&copy; OpenStreetMap contributors</a> CC-BY-SA'
         };
         var baseLayer = new L.TileLayer(BASE_LAYER_URL, BASE_LAYER_OPTIONS);
         self.map.addLayer(baseLayer);

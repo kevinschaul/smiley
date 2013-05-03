@@ -133,7 +133,6 @@ var Map_Display = Display_Module.extend({
 
         var self = this;
         this._super(smiley, target_div);
-        // TODO generalize initial map view
         var MAP_OPTIONS = {
             maxZoom: 12,
             scrollWheelZoom: false
@@ -142,7 +141,7 @@ var Map_Display = Display_Module.extend({
         var BASE_LAYER_URL = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
         var BASE_LAYER_OPTIONS = {
             subdomains: ['a', 'b', 'c'],
-            attribution: '<a href="http://www.openstreetmap.org/copyright">&copy; OpenStreetMap contributors</a> CC-BY-SA',
+            attribution: '<a href="http://www.openstreetmap.org/copyright">&copy; OpenStreetMap contributors</a> CC-BY-SA'
         };
         var baseLayer = new L.TileLayer(BASE_LAYER_URL, BASE_LAYER_OPTIONS);
         self.map.addLayer(baseLayer);
@@ -320,7 +319,7 @@ Search.prototype._search = function(needle) {
         '<% _.each(options, function(option) { %>',
         '<option value="<%- option %>"><%- option %></option>',
         '<% }); %>',
-        '</select>',
+        '</select>'
     ].join('');
     self.controls_select_template = _.template(
         self.controls_select_template_content
@@ -478,8 +477,8 @@ Smiley.prototype._build_controls = function() {
     // Set a timer, so that search is not called on every keypress when a user
     // is typing.
     var timer = null;
-    // TODO Create fallback for other browsers
-    $('#smiley-search').on('input', function() {
+    $('#smiley-search').on($.browser.msie ? 'propertychange' : 'input',
+            function() {
         self.filter.reset_control();
         if (timer) {
             clearTimeout(timer);

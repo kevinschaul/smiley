@@ -12,7 +12,7 @@ var Smiley = function(config) {
         '<% _.each(options, function(option) { %>',
         '<option value="<%- option %>"><%- option %></option>',
         '<% }); %>',
-        '</select>',
+        '</select>'
     ].join('');
     self.controls_select_template = _.template(
         self.controls_select_template_content
@@ -170,8 +170,8 @@ Smiley.prototype._build_controls = function() {
     // Set a timer, so that search is not called on every keypress when a user
     // is typing.
     var timer = null;
-    // TODO Create fallback for other browsers
-    $('#smiley-search').on('input', function() {
+    $('#smiley-search').on($.browser.msie ? 'propertychange' : 'input',
+            function() {
         self.filter.reset_control();
         if (timer) {
             clearTimeout(timer);
