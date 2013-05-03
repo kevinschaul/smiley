@@ -363,7 +363,7 @@ Search.prototype._search = function(needle) {
     });
 };
 
-Smiley.prototype.fetch = function() {
+Smiley.prototype.go = function() {
     /*
     Fetch the data. Called at the user's leisure.
     */
