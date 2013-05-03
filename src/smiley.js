@@ -33,13 +33,17 @@ var Smiley = function(config) {
 
     self.display_modules = [];
     _.each(self.config['views'], function(v, k) {
-        switch(k) {
+        switch(v['type']) {
             case 'table': {
-                self.display_modules.push(new Table_Display(self, v))
+                self.display_modules.push(
+                    new Table_Display(self, v['target_div'])
+                )
                 break;
             }
             case 'map': {
-                self.display_modules.push(new Map_Display(self, v))
+                self.display_modules.push(
+                    new Map_Display(self, v['target_div'])
+                )
                 break;
             }
             default: {
@@ -129,9 +133,7 @@ Smiley.prototype._build_controls = function() {
 
             // Set up change events to the html element
             $('#' + element_id).change(function() {
-                console.log(this);
                 if (this.selectedIndex === 0) {
-                    console.log('reset');
                     self.filter.remove_filter(element_id);
                 } else {
                     self.search.reset_control();
@@ -175,6 +177,30 @@ Smiley.prototype._build_controls = function() {
             self.update_displays();
         }, 250);
     });
+
+    if (self.config['views']) {
+        // TODO Use a template
+        $('#camp-controls').append('View: ');
+        _.each(self.config['views'], function(v, k) {
+            $('#camp-controls').append([
+                '<input type="radio" name="smiley-views" value="',
+                k,
+                '">',
+                v['label']
+            ].join(''));
+        });
+        $('input[name="smiley-views"]').change(function() {
+            self.show_display_module(this.value);
+        });
+    }
+};
+
+Smiley.prototype.show_display_module = function(display_module_index) {
+    var self = this;
+    _.each(self.display_modules, function(e) {
+        e.hide();
+    });
+    self.display_modules[display_module_index].show();
 };
 
 Smiley.prototype._reset_controls = function() {

@@ -15,6 +15,12 @@ var Display_Module = Class.extend({
         var suffix = num_items !== 1 ? 's' : '';
         message_content.push(suffix);
         $('#camp-messages').html(message_content.join(''));
+    },
+    show: function() {
+        $('#' + this.target_div).show();
+    },
+    hide: function() {
+        $('#' + this.target_div).hide();
     }
 });
 
