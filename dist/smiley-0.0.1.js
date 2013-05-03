@@ -186,37 +186,35 @@ var Map_Display = Display_Module.extend({
     */
 
     this._smiley = smiley;
-    this._filters = [];
-    this._search_filter_index = -1;
+    this._filters = {};
 };
 
-Filter.prototype.add_filter = function(filter) {
+Filter.prototype.add_filter = function(id, filter) {
     var self = this;
-    // Keep at most one search filter active
-    if (self._search_filter_index >= 0) {
-        self._filters.splice(self._search_filter_index, 1);
+    if (self._filters[id] || _.size(self._filters) === 0) {
+        self._smiley._reset_dataview();
     }
-    if (filter['type'] === 'search') {
-        self._search_filter_index = self._filters.length;
-    }
-    self._filters.push(filter);
+    self._filters[id] = filter;
 };
 
-Filter.prototype.reset_filters = function() {
+Filter.prototype.reset = function() {
     var self = this;
-    self._filters = [];
+    self._filters = {};
     self._smiley._reset_dataview();
     self._smiley.update_displays();
 };
 
+Filter.prototype.reset_control = function() {
+    var smileys = $('.smiley-select');
+    _.each(smileys, function(e, i) {
+        smileys[i].selectedIndex = 0;
+    });
+};
+
 Filter.prototype.perform_filtering = function() {
     var self = this;
-    _.each(self._filters, function(e) {
-        if (e['type'] === 'filter') {
-            self._smiley.dataview = self._filter(e['needle'], e['category']);
-        } else if (e['type'] === 'search') {
-            self._smiley.dataview = self._search(e['needle']);
-        }
+    _.each(self._filters, function(v, e) {
+        self._smiley.dataview = self._filter(v['needle'], v['category']);
     });
 
     self._smiley.update_displays();
@@ -235,12 +233,39 @@ Filter.prototype._filter = function(needle, category) {
     });
 };
 
-Filter.prototype._search = function(needle) {
+;var Search = function(smiley) {
+    /*
+    Initialize Search object.
+
+    Stores the current search information in `_searchs`.
+    */
+
+    this._smiley = smiley;
+};
+
+Search.prototype.perform_search = function(needle) {
+    var self = this;
+    self._smiley.dataview = self._search(needle);
+    self._smiley.update_displays();
+};
+
+Search.prototype.reset = function() {
+    var self = this;
+    self._smiley._reset_dataview();
+    self._smiley.update_displays();
+};
+
+Search.prototype.reset_control = function() {
+    $('#smiley-search').val('');
+};
+
+Search.prototype._search = function(needle) {
     /*
     Return a datasource containing elements that have `needle` in at least
     one of their `categories_to_search_by`.
     */
 
+    var lneedle = needle.toLowerCase();
     var self = this;
     return self._smiley.dataview.where({
         rows: function(row) {
@@ -249,14 +274,14 @@ Filter.prototype._search = function(needle) {
             _.each(CONFIG['categories_to_search_by'], function(category) {
                 if (_.isString(row[category])) {
                     var haystack = row[category];
-                    if (haystack.toLowerCase().indexOf(needle) >= 0) {
+                    if (haystack.toLowerCase().indexOf(lneedle) >= 0) {
                         ret = true;
                     }
                 } else {
                     // Treat the category as an array
                     var categories = row[category];
                     _.each(categories, function(haystack) {
-                        if (haystack.toLowerCase().indexOf(needle) >= 0) {
+                        if (haystack.toLowerCase().indexOf(lneedle) >= 0) {
                             ret = true;
                         }
                     });
@@ -298,6 +323,7 @@ Filter.prototype._search = function(needle) {
     });
     self.dataview = null;
     self.filter = new Filter(self);
+    self.search = new Search(self);
 
     self.display_modules = [];
     _.each(self.config['views'], function(v, k) {
@@ -397,8 +423,8 @@ Smiley.prototype._build_controls = function() {
 
             // Set up change events to the html element
             $('#' + element_id).change(function() {
-                self.filter.add_filter({
-                    'type': 'filter',
+                self.search.reset_control();
+                self.filter.add_filter(element_id, {
                     'needle': this.value,
                     'category': category
                 });
@@ -408,40 +434,33 @@ Smiley.prototype._build_controls = function() {
     }
 
     $('#camp-controls').append(
-        'Search <input id="search" type="text" />'
+        'Search <input id="smiley-search" type="text" />'
     );
 
-    // Set up reset filters button
+    // Set up eeset filters button
     $('#camp-controls').append(
         '<input id=\'reset\' type=\'button\' value=\'Reset\'>'
     );
     $('#reset').click(function() {
         self._reset_controls();
-        self.filter.reset_filters();
+        self.filter.reset();
+        self.search.reset();
     });
 
     // Set a timer, so that search is not called on every keypress when a user
     // is typing.
     var timer = null;
-    var search_length = 0;
     // TODO Create fallback for other browsers
-    $('#search').on('input', function() {
+    $('#smiley-search').on('input', function() {
+        self.filter.reset_control();
         if (timer) {
             clearTimeout(timer);
         }
         timer = setTimeout(function() {
-            var search_val = $('#search').val();
-            self.filter.add_filter({
-                'type': 'search',
-                'needle': search_val
-            });
-            // Reset dataview if backspace
-            if (search_val.length <= search_length) {
-                // TODO This resets all filters, not just search
-                self._reset_dataview();
-            }
-            search_length = search_val.length;
-            self.filter.perform_filtering();
+            var search_val = $('#smiley-search').val();
+            self._reset_dataview();
+            self.search.perform_search(search_val);
+            self.update_displays();
         }, 250);
     });
 };
@@ -452,12 +471,8 @@ Smiley.prototype._reset_controls = function() {
     */
 
     var self = this;
-    var smileys = $('.smiley-select');
-    _.each(smileys, function(e, i) {
-        smileys[i].selectedIndex = 0;
-    });
-
-    $('#search').val('');
+    self.filter.reset_control();
+    self.search.reset_control();
 };
 
 Smiley.prototype._reset_dataview = function() {
