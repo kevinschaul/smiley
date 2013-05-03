@@ -85,6 +85,12 @@ Optional:
 - `lat_lng`: (String) The json property including location information. Currently must be in the format `'lat,lng'`. Required if `map` view is included in `views`.
 
 
+Caveats
+=======
+
+This code is ultra alpha, and has only been tested against the Star Tribune's example jsonp feeds in Google Chrome.
+
+
 Development
 ===========
 
