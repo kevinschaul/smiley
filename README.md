@@ -23,37 +23,8 @@ Dependencies
 Usage
 =====
 
-Smiley requires a set of configuration parameters to be set, in loose JSON.
-    
-Required:
-
-- `data_url`: (String) The URL of the jsonp feed
-- `data_callback`: (String) The callback of the jsonp feed
-- `data_subset`: (String) The subset of the jsonp feed that the data resides in
-- `categories_to_show`:  (Object: `{ Human-readable name: 'jsonp_property', ... }`) Categories to show in the display modules
-- `categories_to_facet_by`: (Array: `[ 'jsonp_property', ... ]` Categories to create filtering widgets for
-- `categories_to_search_by`: (Array: `[ 'jsonp_property', ... ]` Categories to inlcude in search queries
-- `views`: (Array: 
-
-
-    [
-        {
-            label: 'Human-readable name',
-            type: 'view_type',
-            target_div: 'target-div-id'
-        },
-        ...
-    ]
-
-Display modules to include. First display module in the array becomes the default display.
-
-
-Optional:
-
-- `lat_lng`: 
-
-Example config values:
-
+Smiley requires a set of configuration parameters to be set, in loose JSON. An example configuration follows:
+ 
     var CONFIG = {
         'data_url': 'http://0.0.0.0:8000/camp-guide-2013/data/workspace/camp_guide.jsonp',
         'data_callback': 'miso_callback',
@@ -86,12 +57,31 @@ Example config values:
         'lat_lng': 'latLng'
     };
 
-To initialize Smiley, pass an object with these configuration values to its constructor, and call the `go()` method.
+To run Smiley, create a new instance with these `CONFIG` values, and call its `go()` method.
 
     $(document).ready(function() {
         var s = new Smiley(CONFIG);
         s.go();
     });
+
+
+Field definitions
+-----------------
+
+Required:
+
+- `data_url`: (String) The URL of the jsonp feed
+- `data_callback`: (String) The callback of the jsonp feed
+- `data_subset`: (String) The subset of the json feed that the data resides in
+- `categories_to_show`:  (Object: `{ Human-readable name: 'json_property', ... }`) Categories to show in the display modules
+- `categories_to_facet_by`: (Array: `[ 'json_property', ... ]` Categories to create filtering widgets for
+- `categories_to_search_by`: (Array: `[ 'json_property', ... ]` Categories to inlcude in search queries
+- `views`: (Array: `[ { label: 'Human-readable name', type: 'view_type', target_div: 'target-css-id' }, ... ]` Display modules to include. First display module in the array becomes the default display.
+
+Optional:
+
+- `lat_lng`: (String) The json property including location information. Currently must be in the format `'lat,lng'`. Required if `map` view is included in `views`.
+To initialize Smiley, pass an object with these configuration values to its constructor, and call the `go()` method.
 
 
 Development
