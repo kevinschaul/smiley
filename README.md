@@ -65,6 +65,17 @@ To run Smiley, create a new instance with these `CONFIG` values, and call its `g
         s.go();
     });
 
+Of course, this requires the html divs specified in the `CONGIG` values to exist. A simple html section to match this configuration might look like this:
+
+    <div id='camp-main'></div>
+    <div id='map-target' style='height: 400px; width: 400px;'></div>
+    <table id='table-target'></table>
+
+Note that the map view's `target_div` requires a height and width to display.
+
+Working example
+---------------
+
 To run a working example from this repository:
 
 1. Begin a server in this project's root: `python -m SimpleHTTPServer`
