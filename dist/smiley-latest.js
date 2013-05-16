@@ -310,6 +310,7 @@ Search.prototype.search = function(needle) {
     */
 
     var self = this;
+
     self.config = config;
     
     self.controls_select_template_content = [
@@ -360,6 +361,8 @@ Search.prototype.search = function(needle) {
         }
     });
 };
+
+Smiley.version = '0.0.2';
 
 Smiley.prototype.go = function() {
     /*

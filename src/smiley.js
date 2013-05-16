@@ -4,6 +4,7 @@ var Smiley = function(config) {
     */
 
     var self = this;
+
     self.config = config;
     
     self.controls_select_template_content = [
@@ -54,6 +55,8 @@ var Smiley = function(config) {
         }
     });
 };
+
+Smiley.version = '0.0.2';
 
 Smiley.prototype.go = function() {
     /*
