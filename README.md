@@ -9,8 +9,8 @@ Downloads
 Smiley
 ------
 
-- [Source version (for development)](dist/smiley-0.0.1.js)
-- [Minified version (for production)](dist/smiley-0.0.1.min.js)
+- [Source version (for development)](dist/smiley-latest.js)
+- [Minified version (for production)](dist/smiley-latest.min.js)
 
 Dependencies
 ------------
