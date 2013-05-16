@@ -34,7 +34,6 @@ Search.prototype.search = function(needle) {
     var self = this;
     return self.smiley.dataview.where({
         rows: function(row) {
-            // TODO optimize
             var ret = false;
             _.each(CONFIG['categories_to_search_by'], function(category) {
                 if (_.isString(row[category])) {
