@@ -198,8 +198,8 @@ Smiley.prototype._build_controls = function() {
         var inputs = $('input[name="smiley-views"]');
         inputs.change(function() {
             self.show_display_module($(this).val());
-            self._reset_controls()
-            self._reset_dataview()
+            self._reset_controls();
+            self._reset_dataview();
             self.filter.reset();
             self.search.reset();
         });
@@ -229,6 +229,8 @@ Smiley.prototype._reset_controls = function() {
 Smiley.prototype._reset_dataview = function() {
     /*
     Sets the dataview to include all intial data.
+
+    If a sort order is given, sort the dataview accordingly.
     */
 
     var self = this;
@@ -237,5 +239,17 @@ Smiley.prototype._reset_dataview = function() {
             return true;
         }
     });
+
+    if (self.config.sort_by) {
+        self.dataview.sort(function(rowA, rowB) {
+            var sort_by = self.config.sort_by;
+            if (rowA[sort_by] > rowB[sort_by]) {
+                return 1;
+            } else if (rowA[sort_by] < rowB[sort_by]) {
+                return -1;
+            }
+            return 0;
+        });
+    }
 };
 

@@ -43,6 +43,7 @@ Smiley requires a set of configuration parameters to be set, in loose JSON. An e
             'label',
             'event_category_array'
         ],
+        'sort_by': 'label',
         'views': [
             {
                 'label': 'Map',
@@ -53,7 +54,7 @@ Smiley requires a set of configuration parameters to be set, in loose JSON. An e
                 'label': 'Table',
                 'type': 'table',
                 'target_div': 'table-target'
-            },
+            }
         ],
         'lat_lng': 'latLng'
     };
@@ -100,6 +101,7 @@ Required:
 Optional:
 
 - `lat_lng`: (String) The json property including location information. Currently must be in the format `'lat,lng'`. Required if `map` view is included in `views`.
+- `sort_by`: (String) The json property to sort results by.
 
 
 Caveats
