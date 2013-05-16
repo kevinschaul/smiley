@@ -63,7 +63,7 @@ Smiley.prototype.go = function() {
     var self = this;
     this.ds.fetch({
         success: function() {
-            self._handle_data(this);
+            self.handle_data(this);
         },
         error: function() {
             console.log('error in ds.fetch()');
@@ -71,14 +71,14 @@ Smiley.prototype.go = function() {
     });
 };
 
-Smiley.prototype._handle_data = function() {
+Smiley.prototype.handle_data = function() {
     /*
     Handle initial load of the data.
     */
 
     var self = this;
-    self._build_controls();
-    self._reset_dataview();
+    self.build_controls();
+    self.reset_dataview();
     self.update_displays();
 };
 
@@ -94,7 +94,7 @@ Smiley.prototype.update_displays = function() {
     });
 };
 
-Smiley.prototype._build_controls = function() {
+Smiley.prototype.build_controls = function() {
     /*
     Create html for controls, based on `self.config`.
     */
@@ -162,7 +162,7 @@ Smiley.prototype._build_controls = function() {
         '<input id=\'reset\' type=\'button\' value=\'Reset\'>'
     );
     $('#reset').click(function() {
-        self._reset_controls();
+        self.reset_controls();
         self.filter.reset();
         self.search.reset();
     });
@@ -198,8 +198,8 @@ Smiley.prototype._build_controls = function() {
         var inputs = $('input[name="smiley-views"]');
         inputs.change(function() {
             self.show_display_module($(this).val());
-            self._reset_controls();
-            self._reset_dataview();
+            self.reset_controls();
+            self.reset_dataview();
             self.filter.reset();
             self.search.reset();
         });
@@ -216,7 +216,7 @@ Smiley.prototype.show_display_module = function(display_module_index) {
     self.display_modules[display_module_index].show();
 };
 
-Smiley.prototype._reset_controls = function() {
+Smiley.prototype.reset_controls = function() {
     /*
     Resets any controls to their default state
     */
@@ -226,7 +226,7 @@ Smiley.prototype._reset_controls = function() {
     self.search.reset_control();
 };
 
-Smiley.prototype._reset_dataview = function() {
+Smiley.prototype.reset_dataview = function() {
     /*
     Sets the dataview to include all intial data.
 

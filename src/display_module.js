@@ -1,15 +1,15 @@
 var Display_Module = Class.extend({
     init: function(smiley, target_div) {
-        this._smiley = smiley;
+        this.smiley = smiley;
         this.target_div = target_div;
         this.html_template = null;
-        this._hidden = true;
+        this.hidden = true;
     },
     update: function(dataview) {
-        var num_items = this._smiley.dataview.length;
+        var num_items = this.smiley.dataview.length;
         var message_content = [
             '<b>',
-            this._smiley.dataview.length,
+            this.smiley.dataview.length,
             '</b>',
             ' result',
         ];
@@ -19,11 +19,11 @@ var Display_Module = Class.extend({
     },
     show: function() {
         $('#' + this.target_div).show();
-        this._hidden = false;
+        this.hidden = false;
     },
     hide: function() {
         $('#' + this.target_div).hide();
-        this._hidden = true;
+        this.hidden = true;
     }
 });
 
@@ -32,12 +32,12 @@ var Table_Display = Display_Module.extend({
         this._super(smiley, target_div);
 
         var self = this;
-        self._table_template_content = ['<tr>'];
-        _.each(self._smiley.config['categories_to_show'], function(v, k) {
-            self._table_template_content.push(['<td><%- ', v, '%></td>'].join(''));
+        self.table_template_content = ['<tr>'];
+        _.each(self.smiley.config['categories_to_show'], function(v, k) {
+            self.table_template_content.push(['<td><%- ', v, '%></td>'].join(''));
         });
-        self._table_template_content.push('</tr>');
-        self.table_template = _.template(self._table_template_content.join(''));
+        self.table_template_content.push('</tr>');
+        self.table_template = _.template(self.table_template_content.join(''));
     },
     update: function(dataview) {
         /*
@@ -47,7 +47,7 @@ var Table_Display = Display_Module.extend({
 
         var self = this;
         var table_header = ['<tr>'];
-        _.each(self._smiley.config['categories_to_show'], function(v, k) {
+        _.each(self.smiley.config['categories_to_show'], function(v, k) {
             table_header.push([
                 '<th>',
                 k,
@@ -56,7 +56,7 @@ var Table_Display = Display_Module.extend({
         });
         table_header.push('</tr>');
         $('#' + self.target_div).html(table_header.join(''));
-        self._smiley.dataview.each(function(row, i) {
+        self.smiley.dataview.each(function(row, i) {
             $('#' + self.target_div).append(self.table_template(row));
         });
     }
@@ -90,19 +90,19 @@ var Map_Display = Display_Module.extend({
         */
 
         var self = this;
-        if (!self._hidden) {
+        if (!self.hidden) {
             if (self.markersLayer && self.map.hasLayer(self.markersLayer)) {
                 self.map.removeLayer(self.markersLayer);
             }
             self.markersLayer = new L.MarkerClusterGroup();
             var at_least_one_point = false;
-            self._smiley.dataview.each(function(row) {
+            self.smiley.dataview.each(function(row) {
                 at_least_one_point = true;
-                var lat_lng = row[self._smiley.config['lat_lng']];
+                var lat_lng = row[self.smiley.config['lat_lng']];
                 if (lat_lng) {
                     var marker = new L.marker(lat_lng.split(','));
                     var popup = [];
-                    _.each(self._smiley.config['categories_to_show'], function(v, k) {
+                    _.each(self.smiley.config['categories_to_show'], function(v, k) {
                         popup.push([
                             '<b>',
                             k,

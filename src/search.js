@@ -5,26 +5,26 @@ var Search = function(smiley) {
     Stores the current search information in `_searchs`.
     */
 
-    this._smiley = smiley;
+    this.smiley = smiley;
 };
 
 Search.prototype.perform_search = function(needle) {
     var self = this;
-    self._smiley.dataview = self._search(needle);
-    self._smiley.update_displays();
+    self.smiley.dataview = self.search(needle);
+    self.smiley.update_displays();
 };
 
 Search.prototype.reset = function() {
     var self = this;
-    self._smiley._reset_dataview();
-    self._smiley.update_displays();
+    self.smiley.reset_dataview();
+    self.smiley.update_displays();
 };
 
 Search.prototype.reset_control = function() {
     $('#smiley-search').val('');
 };
 
-Search.prototype._search = function(needle) {
+Search.prototype.search = function(needle) {
     /*
     Return a datasource containing elements that have `needle` in at least
     one of their `categories_to_search_by`.
@@ -32,7 +32,7 @@ Search.prototype._search = function(needle) {
 
     var lneedle = needle.toLowerCase();
     var self = this;
-    return self._smiley.dataview.where({
+    return self.smiley.dataview.where({
         rows: function(row) {
             // TODO optimize
             var ret = false;

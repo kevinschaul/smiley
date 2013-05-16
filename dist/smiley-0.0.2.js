@@ -63,16 +63,16 @@
   };
 })();;var Display_Module = Class.extend({
     init: function(smiley, target_div) {
-        this._smiley = smiley;
+        this.smiley = smiley;
         this.target_div = target_div;
         this.html_template = null;
-        this._hidden = true;
+        this.hidden = true;
     },
     update: function(dataview) {
-        var num_items = this._smiley.dataview.length;
+        var num_items = this.smiley.dataview.length;
         var message_content = [
             '<b>',
-            this._smiley.dataview.length,
+            this.smiley.dataview.length,
             '</b>',
             ' result',
         ];
@@ -82,11 +82,11 @@
     },
     show: function() {
         $('#' + this.target_div).show();
-        this._hidden = false;
+        this.hidden = false;
     },
     hide: function() {
         $('#' + this.target_div).hide();
-        this._hidden = true;
+        this.hidden = true;
     }
 });
 
@@ -95,12 +95,12 @@ var Table_Display = Display_Module.extend({
         this._super(smiley, target_div);
 
         var self = this;
-        self._table_template_content = ['<tr>'];
-        _.each(self._smiley.config['categories_to_show'], function(v, k) {
-            self._table_template_content.push(['<td><%- ', v, '%></td>'].join(''));
+        self.table_template_content = ['<tr>'];
+        _.each(self.smiley.config['categories_to_show'], function(v, k) {
+            self.table_template_content.push(['<td><%- ', v, '%></td>'].join(''));
         });
-        self._table_template_content.push('</tr>');
-        self.table_template = _.template(self._table_template_content.join(''));
+        self.table_template_content.push('</tr>');
+        self.table_template = _.template(self.table_template_content.join(''));
     },
     update: function(dataview) {
         /*
@@ -110,7 +110,7 @@ var Table_Display = Display_Module.extend({
 
         var self = this;
         var table_header = ['<tr>'];
-        _.each(self._smiley.config['categories_to_show'], function(v, k) {
+        _.each(self.smiley.config['categories_to_show'], function(v, k) {
             table_header.push([
                 '<th>',
                 k,
@@ -119,7 +119,7 @@ var Table_Display = Display_Module.extend({
         });
         table_header.push('</tr>');
         $('#' + self.target_div).html(table_header.join(''));
-        self._smiley.dataview.each(function(row, i) {
+        self.smiley.dataview.each(function(row, i) {
             $('#' + self.target_div).append(self.table_template(row));
         });
     }
@@ -153,19 +153,19 @@ var Map_Display = Display_Module.extend({
         */
 
         var self = this;
-        if (!self._hidden) {
+        if (!self.hidden) {
             if (self.markersLayer && self.map.hasLayer(self.markersLayer)) {
                 self.map.removeLayer(self.markersLayer);
             }
             self.markersLayer = new L.MarkerClusterGroup();
             var at_least_one_point = false;
-            self._smiley.dataview.each(function(row) {
+            self.smiley.dataview.each(function(row) {
                 at_least_one_point = true;
-                var lat_lng = row[self._smiley.config['lat_lng']];
+                var lat_lng = row[self.smiley.config['lat_lng']];
                 if (lat_lng) {
                     var marker = new L.marker(lat_lng.split(','));
                     var popup = [];
-                    _.each(self._smiley.config['categories_to_show'], function(v, k) {
+                    _.each(self.smiley.config['categories_to_show'], function(v, k) {
                         popup.push([
                             '<b>',
                             k,
@@ -195,25 +195,25 @@ var Map_Display = Display_Module.extend({
     Stores the current filter information in `_filters`.
     */
 
-    this._smiley = smiley;
-    this._filters = {};
+    this.smiley = smiley;
+    this.filters = {};
 };
 
 Filter.prototype.add_filter = function(id, filter) {
     var self = this;
-    self._filters[id] = filter;
+    self.filters[id] = filter;
 };
 
 Filter.prototype.remove_filter = function(id) {
     var self = this;
-    delete self._filters[id];
+    delete self.filters[id];
 };
 
 Filter.prototype.reset = function() {
     var self = this;
-    self._filters = {};
-    self._smiley._reset_dataview();
-    self._smiley.update_displays();
+    self.filters = {};
+    self.smiley.reset_dataview();
+    self.smiley.update_displays();
 };
 
 Filter.prototype.reset_control = function() {
@@ -225,21 +225,21 @@ Filter.prototype.reset_control = function() {
 
 Filter.prototype.perform_filtering = function() {
     var self = this;
-    self._smiley._reset_dataview();
-    _.each(self._filters, function(v, e) {
-        self._smiley.dataview = self._filter(v['needle'], v['category']);
+    self.smiley.reset_dataview();
+    _.each(self.filters, function(v, e) {
+        self.smiley.dataview = self.filter(v['needle'], v['category']);
     });
 
-    self._smiley.update_displays();
+    self.smiley.update_displays();
 };
 
-Filter.prototype._filter = function(needle, category) {
+Filter.prototype.filter = function(needle, category) {
     /*
     Returns a datasource containing elements with the passed in category
     */
 
     var self = this;
-    return self._smiley.dataview.where({
+    return self.smiley.dataview.where({
         rows: function(row) {
             return _.contains(row[category], needle);
         }
@@ -253,26 +253,26 @@ Filter.prototype._filter = function(needle, category) {
     Stores the current search information in `_searchs`.
     */
 
-    this._smiley = smiley;
+    this.smiley = smiley;
 };
 
 Search.prototype.perform_search = function(needle) {
     var self = this;
-    self._smiley.dataview = self._search(needle);
-    self._smiley.update_displays();
+    self.smiley.dataview = self.search(needle);
+    self.smiley.update_displays();
 };
 
 Search.prototype.reset = function() {
     var self = this;
-    self._smiley._reset_dataview();
-    self._smiley.update_displays();
+    self.smiley.reset_dataview();
+    self.smiley.update_displays();
 };
 
 Search.prototype.reset_control = function() {
     $('#smiley-search').val('');
 };
 
-Search.prototype._search = function(needle) {
+Search.prototype.search = function(needle) {
     /*
     Return a datasource containing elements that have `needle` in at least
     one of their `categories_to_search_by`.
@@ -280,7 +280,7 @@ Search.prototype._search = function(needle) {
 
     var lneedle = needle.toLowerCase();
     var self = this;
-    return self._smiley.dataview.where({
+    return self.smiley.dataview.where({
         rows: function(row) {
             // TODO optimize
             var ret = false;
@@ -370,7 +370,7 @@ Smiley.prototype.go = function() {
     var self = this;
     this.ds.fetch({
         success: function() {
-            self._handle_data(this);
+            self.handle_data(this);
         },
         error: function() {
             console.log('error in ds.fetch()');
@@ -378,14 +378,14 @@ Smiley.prototype.go = function() {
     });
 };
 
-Smiley.prototype._handle_data = function() {
+Smiley.prototype.handle_data = function() {
     /*
     Handle initial load of the data.
     */
 
     var self = this;
-    self._build_controls();
-    self._reset_dataview();
+    self.build_controls();
+    self.reset_dataview();
     self.update_displays();
 };
 
@@ -401,7 +401,7 @@ Smiley.prototype.update_displays = function() {
     });
 };
 
-Smiley.prototype._build_controls = function() {
+Smiley.prototype.build_controls = function() {
     /*
     Create html for controls, based on `self.config`.
     */
@@ -469,7 +469,7 @@ Smiley.prototype._build_controls = function() {
         '<input id=\'reset\' type=\'button\' value=\'Reset\'>'
     );
     $('#reset').click(function() {
-        self._reset_controls();
+        self.reset_controls();
         self.filter.reset();
         self.search.reset();
     });
@@ -505,8 +505,8 @@ Smiley.prototype._build_controls = function() {
         var inputs = $('input[name="smiley-views"]');
         inputs.change(function() {
             self.show_display_module($(this).val());
-            self._reset_controls();
-            self._reset_dataview();
+            self.reset_controls();
+            self.reset_dataview();
             self.filter.reset();
             self.search.reset();
         });
@@ -523,7 +523,7 @@ Smiley.prototype.show_display_module = function(display_module_index) {
     self.display_modules[display_module_index].show();
 };
 
-Smiley.prototype._reset_controls = function() {
+Smiley.prototype.reset_controls = function() {
     /*
     Resets any controls to their default state
     */
@@ -533,7 +533,7 @@ Smiley.prototype._reset_controls = function() {
     self.search.reset_control();
 };
 
-Smiley.prototype._reset_dataview = function() {
+Smiley.prototype.reset_dataview = function() {
     /*
     Sets the dataview to include all intial data.
 
