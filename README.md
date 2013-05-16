@@ -1,8 +1,6 @@
 Smiley
 ======
 
-Like [Simile](http://simile-widgets.org/exhibit/), but without the pain.
-
 Smiley attempts to display structured data feeds in a smart, customizable way.
 
 Downloads
@@ -119,3 +117,8 @@ Assuming Node.js is already installed:
 
     npm install -g grunt-init grunt-cli
 
+
+Similar projects
+================
+
+- [Simile Exhibit](http://simile-widgets.org/exhibit/)
