@@ -175,7 +175,7 @@ Smiley.prototype.build_controls = function() {
     // Set a timer, so that search is not called on every keypress when a user
     // is typing.
     var timer = null;
-    $('#smiley-search').on($.browser.msie ? 'propertychange' : 'input',
+    $('#smiley-search').on($.browser.msie ? 'keydown' : 'input',
             function() {
         self.filter.reset_control();
         if (timer) {
