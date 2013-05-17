@@ -110,49 +110,51 @@ Smiley.prototype.build_controls = function() {
     var controls_html = [];
     if (self.config['categories_to_facet_by']) {
         _.each(self.config['categories_to_facet_by'], function(category) {
-            // Find unique values
-            var uniques = [];
-            var data = self.ds.column(category).data;
-            _.each(data, function(item) {
-                if (_.isArray(item)) {
-                    _.each(item, function(subitem) {
-                        if (!_.contains(uniques, subitem)) {
-                            uniques.push(subitem);
+            if (category) {
+                // Find unique values
+                var uniques = [];
+                var data = self.ds.column(category).data;
+                _.each(data, function(item) {
+                    if (_.isArray(item)) {
+                        _.each(item, function(subitem) {
+                            if (!_.contains(uniques, subitem)) {
+                                uniques.push(subitem);
+                            }
+                        });
+                    } else {
+                        if (!_.contains(uniques, item)) {
+                            uniques.push(item);
                         }
-                    });
-                } else {
-                    if (!_.contains(uniques, item)) {
-                        uniques.push(item);
                     }
-                }
-            });
+                });
 
-            var uniques_sorted = _.sortBy(uniques, function(item) {
-                return item;
-            });
+                var uniques_sorted = _.sortBy(uniques, function(item) {
+                    return item;
+                });
 
-            // Send unique values to a select html element
-            var element_id = 'element-' + category;
-            $('#smiley-controls').append(
-                self.controls_select_template({
-                    'id': element_id,
-                    'options': uniques_sorted
-                })
-            );
+                // Send unique values to a select html element
+                var element_id = 'element-' + category;
+                $('#smiley-controls').append(
+                    self.controls_select_template({
+                        'id': element_id,
+                        'options': uniques_sorted
+                    })
+                );
 
-            // Set up change events to the html element
-            $('#' + element_id).change(function() {
-                if (this.selectedIndex === 0) {
-                    self.filter.remove_filter(element_id);
-                } else {
-                    self.search.reset_control();
-                    self.filter.add_filter(element_id, {
-                        'needle': this.value,
-                        'category': category
-                    });
-                }
-                self.filter.perform_filtering();
-            });
+                // Set up change events to the html element
+                $('#' + element_id).change(function() {
+                    if (this.selectedIndex === 0) {
+                        self.filter.remove_filter(element_id);
+                    } else {
+                        self.search.reset_control();
+                        self.filter.add_filter(element_id, {
+                            'needle': this.value,
+                            'category': category
+                        });
+                    }
+                    self.filter.perform_filtering();
+                });
+            }
         });
     }
 
