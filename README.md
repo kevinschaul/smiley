@@ -25,9 +25,9 @@ Smiley requires a set of configuration parameters to be set, in loose JSON. An e
  
     var CONFIG = {
         'target_div': 'camp-main',
-        'data_url': 'http://0.0.0.0:8000/camp-guide-2013/data/workspace/camp_guide.jsonp',
+        'data_url': '/examples/camp_guide.jsonp',
         'data_callback': 'miso_callback',
-        'data_subset': 'items', 
+        'data_subset': 'items',
         'categories_to_show': {
             'Camp name': 'label',
             'Price range': 'price_range',
@@ -46,15 +46,18 @@ Smiley requires a set of configuration parameters to be set, in loose JSON. An e
             {
                 'label': 'Map',
                 'type': 'map',
-                'target_div': 'map-target'
+                'target_div': 'map-target',
+                'view_settings': {
+                    'lat_lng': 'latLng',
+                    'directions_query': 'label'
+                }
             },
             {
                 'label': 'Table',
                 'type': 'table',
                 'target_div': 'table-target'
             }
-        ],
-        'lat_lng': 'latLng'
+        ]
     };
 
 To run Smiley, create a new instance with these `CONFIG` values, and call its `go()` method.
@@ -94,12 +97,16 @@ Required:
 - `categories_to_show`:  (Object: `{ Human-readable name: 'json_property', ... }`) Categories to show in the display modules
 - `categories_to_facet_by`: (Array: `[ 'json_property', ... ]` Categories to create filtering widgets for
 - `categories_to_search_by`: (Array: `[ 'json_property', ... ]` Categories to inlcude in search queries
-- `views`: (Array: `[ { label: 'Human-readable name', type: 'view_type', target_div: 'target-css-id' }, ... ]` Display modules to include. First display module in the array becomes the default display.
+- `views`: (Array: `[ { label: 'Human-readable name', type: 'view_type', target_div: 'target-css-id', view_settings: { ... } }, ... ]` Display modules to include. First display module in the array becomes the default display.
 
 Optional:
 
-- `lat_lng`: (String) The json property including location information. Currently must be in the format `'lat,lng'`. Required if `map` view is included in `views`.
 - `sort_by`: (String) The json property to sort results by.
+
+Map display `view_settings`:
+
+- `lat_lng`: (String) The json property including location information. Currently must be in the format `lat,lng`.
+- `directions_query`: (String) The json property to build a Google Maps directions url from. The resulting link will search for locations by the name of the `directions_query` property in the area of the `lat_lng` property.
 
 
 Caveats
