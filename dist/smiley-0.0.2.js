@@ -507,7 +507,7 @@ Smiley.prototype.build_controls = function() {
         }, 250);
     });
 
-    if (self.config['views']) {
+    if (self.config['views'] && self.config['views'].length > 1) {
         // TODO Use a template
         $('#smiley-controls').append('View: ');
         _.each(self.config['views'], function(v, k) {
