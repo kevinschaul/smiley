@@ -39,13 +39,13 @@ var Smiley = function(config) {
         switch(v['type']) {
             case 'table': {
                 self.display_modules.push(
-                    new Table_Display(self, v['target_div'])
+                    new Table_Display(self, v['target_div'], v['view_settings'])
                 )
                 break;
             }
             case 'map': {
                 self.display_modules.push(
-                    new Map_Display(self, v['target_div'])
+                    new Map_Display(self, v['target_div'], v['view_settings'])
                 )
                 break;
             }

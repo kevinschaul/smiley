@@ -62,9 +62,10 @@
     return Class;
   };
 })();;var Display_Module = Class.extend({
-    init: function(smiley, target_div) {
+    init: function(smiley, target_div, view_settings) {
         this.smiley = smiley;
         this.target_div = target_div;
+        this.view_settings = view_settings;
         this.html_template = null;
         this.hidden = true;
     },
@@ -91,8 +92,8 @@
 });
 
 var Table_Display = Display_Module.extend({
-    init: function(smiley, target_div) {
-        this._super(smiley, target_div);
+    init: function(smiley, target_div, view_settings) {
+        this._super(smiley, target_div, view_settings);
 
         var self = this;
         self.table_template_content = ['<tr>'];
@@ -126,13 +127,13 @@ var Table_Display = Display_Module.extend({
 });
 
 var Map_Display = Display_Module.extend({
-    init: function(smiley, target_div) {
+    init: function(smiley, target_div, view_settings) {
         /*
         Initialize a map with base layer
         */
 
         var self = this;
-        this._super(smiley, target_div);
+        this._super(smiley, target_div, view_settings);
         var MAP_OPTIONS = {
             maxZoom: 12,
             scrollWheelZoom: false
@@ -161,7 +162,7 @@ var Map_Display = Display_Module.extend({
             var at_least_one_point = false;
             self.smiley.dataview.each(function(row) {
                 at_least_one_point = true;
-                var lat_lng = row[self.smiley.config['lat_lng']];
+                var lat_lng = row[self.view_settings['lat_lng']];
                 if (lat_lng) {
                     var marker = new L.marker(lat_lng.split(','));
                     var popup = [];
@@ -175,6 +176,17 @@ var Map_Display = Display_Module.extend({
                             '<br />'
                         ].join(''))
                     });
+                    if (self.view_settings['directions_query']) {
+                        popup.push([
+                            '<a target="_blank" href="',
+                            'https://maps.google.com/?f=d&q=',
+                            row[self.view_settings['directions_query']],
+                            '&near=',
+                            row[self.view_settings['lat_lng']],
+                            '">Get driving directions</a>',
+                            '<br />'
+                        ].join(''));
+                    }
                     marker.bindPopup(popup.join(''));
                     self.markersLayer.addLayer(marker);
                 }
@@ -345,13 +357,13 @@ Search.prototype.search = function(needle) {
         switch(v['type']) {
             case 'table': {
                 self.display_modules.push(
-                    new Table_Display(self, v['target_div'])
+                    new Table_Display(self, v['target_div'], v['view_settings'])
                 )
                 break;
             }
             case 'map': {
                 self.display_modules.push(
-                    new Map_Display(self, v['target_div'])
+                    new Map_Display(self, v['target_div'], v['view_settings'])
                 )
                 break;
             }
@@ -416,49 +428,51 @@ Smiley.prototype.build_controls = function() {
     var controls_html = [];
     if (self.config['categories_to_facet_by']) {
         _.each(self.config['categories_to_facet_by'], function(category) {
-            // Find unique values
-            var uniques = [];
-            var data = self.ds.column(category).data;
-            _.each(data, function(item) {
-                if (_.isArray(item)) {
-                    _.each(item, function(subitem) {
-                        if (!_.contains(uniques, subitem)) {
-                            uniques.push(subitem);
+            if (category) {
+                // Find unique values
+                var uniques = [];
+                var data = self.ds.column(category).data;
+                _.each(data, function(item) {
+                    if (_.isArray(item)) {
+                        _.each(item, function(subitem) {
+                            if (!_.contains(uniques, subitem)) {
+                                uniques.push(subitem);
+                            }
+                        });
+                    } else {
+                        if (!_.contains(uniques, item)) {
+                            uniques.push(item);
                         }
-                    });
-                } else {
-                    if (!_.contains(uniques, item)) {
-                        uniques.push(item);
                     }
-                }
-            });
+                });
 
-            var uniques_sorted = _.sortBy(uniques, function(item) {
-                return item;
-            });
+                var uniques_sorted = _.sortBy(uniques, function(item) {
+                    return item;
+                });
 
-            // Send unique values to a select html element
-            var element_id = 'element-' + category;
-            $('#smiley-controls').append(
-                self.controls_select_template({
-                    'id': element_id,
-                    'options': uniques_sorted
-                })
-            );
+                // Send unique values to a select html element
+                var element_id = 'element-' + category;
+                $('#smiley-controls').append(
+                    self.controls_select_template({
+                        'id': element_id,
+                        'options': uniques_sorted
+                    })
+                );
 
-            // Set up change events to the html element
-            $('#' + element_id).change(function() {
-                if (this.selectedIndex === 0) {
-                    self.filter.remove_filter(element_id);
-                } else {
-                    self.search.reset_control();
-                    self.filter.add_filter(element_id, {
-                        'needle': this.value,
-                        'category': category
-                    });
-                }
-                self.filter.perform_filtering();
-            });
+                // Set up change events to the html element
+                $('#' + element_id).change(function() {
+                    if (this.selectedIndex === 0) {
+                        self.filter.remove_filter(element_id);
+                    } else {
+                        self.search.reset_control();
+                        self.filter.add_filter(element_id, {
+                            'needle': this.value,
+                            'category': category
+                        });
+                    }
+                    self.filter.perform_filtering();
+                });
+            }
         });
     }
 
@@ -479,7 +493,7 @@ Smiley.prototype.build_controls = function() {
     // Set a timer, so that search is not called on every keypress when a user
     // is typing.
     var timer = null;
-    $('#smiley-search').on($.browser.msie ? 'propertychange' : 'input',
+    $('#smiley-search').on($.browser.msie ? 'keydown' : 'input',
             function() {
         self.filter.reset_control();
         if (timer) {

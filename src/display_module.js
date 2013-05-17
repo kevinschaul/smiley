@@ -1,7 +1,8 @@
 var Display_Module = Class.extend({
-    init: function(smiley, target_div) {
+    init: function(smiley, target_div, view_settings) {
         this.smiley = smiley;
         this.target_div = target_div;
+        this.view_settings = view_settings;
         this.html_template = null;
         this.hidden = true;
     },
@@ -28,8 +29,8 @@ var Display_Module = Class.extend({
 });
 
 var Table_Display = Display_Module.extend({
-    init: function(smiley, target_div) {
-        this._super(smiley, target_div);
+    init: function(smiley, target_div, view_settings) {
+        this._super(smiley, target_div, view_settings);
 
         var self = this;
         self.table_template_content = ['<tr>'];
@@ -63,13 +64,13 @@ var Table_Display = Display_Module.extend({
 });
 
 var Map_Display = Display_Module.extend({
-    init: function(smiley, target_div) {
+    init: function(smiley, target_div, view_settings) {
         /*
         Initialize a map with base layer
         */
 
         var self = this;
-        this._super(smiley, target_div);
+        this._super(smiley, target_div, view_settings);
         var MAP_OPTIONS = {
             maxZoom: 12,
             scrollWheelZoom: false
@@ -98,7 +99,7 @@ var Map_Display = Display_Module.extend({
             var at_least_one_point = false;
             self.smiley.dataview.each(function(row) {
                 at_least_one_point = true;
-                var lat_lng = row[self.smiley.config['lat_lng']];
+                var lat_lng = row[self.view_settings['lat_lng']];
                 if (lat_lng) {
                     var marker = new L.marker(lat_lng.split(','));
                     var popup = [];
@@ -112,6 +113,17 @@ var Map_Display = Display_Module.extend({
                             '<br />'
                         ].join(''))
                     });
+                    if (self.view_settings['directions_query']) {
+                        popup.push([
+                            '<a target="_blank" href="',
+                            'https://maps.google.com/?f=d&q=',
+                            row[self.view_settings['directions_query']],
+                            '&near=',
+                            row[self.view_settings['lat_lng']],
+                            '">Get driving directions</a>',
+                            '<br />'
+                        ].join(''));
+                    }
                     marker.bindPopup(popup.join(''));
                     self.markersLayer.addLayer(marker);
                 }

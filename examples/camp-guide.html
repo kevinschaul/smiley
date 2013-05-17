@@ -62,15 +62,18 @@ var CONFIG = {
         {
             'label': 'Map',
             'type': 'map',
-            'target_div': 'map-target'
+            'target_div': 'map-target',
+            'view_settings': {
+                'lat_lng': 'latLng',
+                'directions_query': 'label'
+            }
         },
         {
             'label': 'Table',
             'type': 'table',
             'target_div': 'table-target'
         }
-    ],
-    'lat_lng': 'latLng'
+    ]
 };
 
 $(document).ready(function() {
