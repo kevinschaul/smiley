@@ -28,12 +28,22 @@ Smiley requires a set of configuration parameters to be set, in loose JSON. An e
         'data_url': '/examples/camp_guide.jsonp',
         'data_callback': 'miso_callback',
         'data_subset': 'items',
-        'categories_to_show': {
-            'Camp name': 'label',
-            'Price range': 'price_range',
-            'Ages': 'event_who',
-            'Categories': 'event_category_array'
-        },
+        'categories_to_show': [
+            {
+                'property': 'label',
+                'label': 'Camp name',
+                'link': 'info_website'
+            }, {
+                'property': 'price_range',
+                'label': 'Price range'
+            }, {
+                'property': 'event_who',
+                'label': 'Ages'
+            }, {
+                'property': 'event_category_array',
+                'label': 'Categories'
+            }
+        ],
         'categories_to_facet_by': [
             'event_category_array',
         ],
@@ -94,7 +104,7 @@ Required:
 - `data_url`: (String) The URL of the jsonp feed
 - `data_callback`: (String) The callback of the jsonp feed
 - `data_subset`: (String) The subset of the json feed that the data resides in
-- `categories_to_show`:  (Object: `{ Human-readable name: 'json_property', ... }`) Categories to show in the display modules
+- `categories_to_show`:  (Array: `{ 'property': 'json_property', 'label': 'Human-readable label', 'link': 'json_property' }`) Categories to show in the display modules. `link` is optional.
 - `categories_to_facet_by`: (Array: `[ 'json_property', ... ]` Categories to create filtering widgets for
 - `categories_to_search_by`: (Array: `[ 'json_property', ... ]` Categories to inlcude in search queries
 - `views`: (Array: `[ { label: 'Human-readable name', type: 'view_type', target_div: 'target-css-id', view_settings: { ... } }, ... ]` Display modules to include. First display module in the array becomes the default display.

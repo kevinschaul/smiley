@@ -34,8 +34,29 @@ var Table_Display = Display_Module.extend({
 
         var self = this;
         self.table_template_content = ['<tr>'];
-        _.each(self.smiley.config['categories_to_show'], function(v, k) {
-            self.table_template_content.push(['<td><%- ', v, '%></td>'].join(''));
+        _.each(self.smiley.config['categories_to_show'], function(e) {
+            if (e.link) {
+                var v = [
+                    '<td>',
+                    '<a target="_blank" href="<%- ',
+                    e.link,
+                    ' %>" >',
+                    '<%- ',
+                    e.property,
+                    ' %>',
+                    '</a>',
+                    '</td>'
+                ];
+            } else {
+                var v = [
+                    '<td>',
+                    '<%- ',
+                    e.property,
+                    ' %>',
+                    '</td>'
+                ];
+            }
+            self.table_template_content.push(v.join(''));
         });
         self.table_template_content.push('</tr>');
         self.table_template = _.template(self.table_template_content.join(''));
@@ -48,10 +69,10 @@ var Table_Display = Display_Module.extend({
 
         var self = this;
         var table_header = ['<tr>'];
-        _.each(self.smiley.config['categories_to_show'], function(v, k) {
+        _.each(self.smiley.config['categories_to_show'], function(e) {
             table_header.push([
                 '<th>',
-                k,
+                e.label,
                 '</th>'
             ].join(''));
         });
@@ -103,15 +124,31 @@ var Map_Display = Display_Module.extend({
                 if (lat_lng) {
                     var marker = new L.marker(lat_lng.split(','));
                     var popup = [];
-                    _.each(self.smiley.config['categories_to_show'], function(v, k) {
-                        popup.push([
-                            '<b>',
-                            k,
-                            ': ',
-                            '</b>',
-                            row[v],
-                            '<br />'
-                        ].join(''))
+                    _.each(self.smiley.config['categories_to_show'], function(e) {
+                        if (e.link) {
+                            var v = [
+                                '<b>',
+                                e.label,
+                                ': ',
+                                '</b>',
+                                '<a target="_blank" href="',
+                                row[e.link],
+                                '">',
+                                row[e.property],
+                                '</a>',
+                                '<br />'
+                            ];
+                        } else {
+                            var v = [
+                                '<b>',
+                                e.label,
+                                ': ',
+                                '</b>',
+                                row[e.property],
+                                '<br />'
+                            ];
+                        }
+                        popup.push(v.join(''));
                     });
                     if (self.view_settings['directions_query']) {
                         popup.push([

@@ -44,12 +44,22 @@ var CONFIG = {
     'data_url': '/examples/camp_guide.jsonp',
     'data_callback': 'miso_callback',
     'data_subset': 'items',
-    'categories_to_show': {
-        'Camp name': 'label',
-        'Price range': 'price_range',
-        'Ages': 'event_who',
-        'Categories': 'event_category_array'
-    },
+    'categories_to_show': [
+        {
+            'property': 'label',
+            'label': 'Camp name',
+            'link': 'info_website'
+        }, {
+            'property': 'price_range',
+            'label': 'Price range'
+        }, {
+            'property': 'event_who',
+            'label': 'Ages'
+        }, {
+            'property': 'event_category_array',
+            'label': 'Categories'
+        }
+    ],
     'categories_to_facet_by': [
         'event_category_array',
     ],
